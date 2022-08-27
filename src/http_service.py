@@ -1,26 +1,31 @@
+from distutils.command.config import config
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+import config
 
-# #hostName = "localhost"
-# hostName = "192.168.222.19"
-# #hostName = "192.168.222.19"
-# hostPort = 9000
+conf = config.Config('config.json');
 
-# class MyServer(BaseHTTPRequestHandler):
-#     def do_GET(self):
-#         self.send_response(200)
-#         self.send_header("Content-type", "text/html".encode())
-#         self.end_headers()
-#         self.wfile.write("Test Agent !".encode())
+class MyServer(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html".encode())
+        self.end_headers()
 
-# myServer = HTTPServer((hostName, hostPort), MyServer)
-# print(time.asctime(), "Program Agent Starts - %s:%s" % (hostName, hostPort))
+        conf.changeCounter()
+        text = "Test Agent conter: {} !".format(conf.counter)
 
-# try:
-#     myServer.serve_forever()
-# except KeyboardInterrupt:
-#     pass
+        
+        self.wfile.write(text.encode())
 
-# myServer.server_close()
-# print(time.asctime(), "Program Agent Stops - %s:%s" % (hostName, hostPort))
+httpServeConf = (conf.hostName, conf.hostPort)
+myServer = HTTPServer(httpServeConf, MyServer)
+print(time.asctime(), "Program Agent Starts - %s:%s" % httpServeConf)
+
+try:
+    myServer.serve_forever()
+except KeyboardInterrupt:
+    pass
+
+myServer.server_close()
+print(time.asctime(), "Program Agent Stops - %s:%s" % httpServeConf)
 
