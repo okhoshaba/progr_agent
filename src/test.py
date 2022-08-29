@@ -1,6 +1,9 @@
-import requests
+# #!/usr/local/bin/python3.5
+import asyncio
 import time
 import config
+import aiohttp
+import asyncio
 
 conf = config.Config('config.json');
 
@@ -10,15 +13,22 @@ url = 'http://%s:%s' % (conf.hostName, conf.hostPort)
 print(time.asctime(), "Test Agent Starts - ", url)
 
 messageCounter = 0
-session = requests.Session()
 
-try:
-    while True:
-        print(time.asctime(), "Send message")
-        r = session.get(url, verify=False, timeout=0.01)  
-        messageCounter += 1
-        print(time.asctime(), "Response -", r.content)
-except KeyboardInterrupt:
-    pass
+async def get_pokemon(session, url):
+    print(time.asctime(), "Send message - ", url)
+    async with session.get(url) as resp:
+        text = await resp.text()
+        print(text)
+        return text;
 
+async def main():
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for number in range(1, 20):
+            tasks.append(asyncio.ensure_future(get_pokemon(session, url)))
+
+        original_pokemon = await asyncio.gather(*tasks)
+
+asyncio.run(main())
 

@@ -1,5 +1,8 @@
+import asyncio
+from concurrent.futures import thread
 from distutils.command.config import config
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from tokenize import String
 from urllib.parse import urlparse
 import time
 import config
@@ -7,27 +10,25 @@ import logging
 
 conf = config.Config('config.json');
 
-class MyServer(BaseHTTPRequestHandler):
-    def do_GET(self):
-        parsed_path = urlparse(self.path)
-        print(parsed_path)
-        print(time.asctime(), "Recive message")
-        self.send_response(200)
-        self.send_header("Content-type", "text/html".encode())
-        self.end_headers()
-        conf.changeCounter()
-        text = "Test Agent conter: {} !".format(conf.counter)
-        self.wfile.write(text.encode())
+from aiohttp import web
 
-httpServeConf = (conf.hostName, conf.hostPort)
-myServer = HTTPServer(httpServeConf, MyServer)
-print(time.asctime(), "Program Agent Starts - %s:%s" % httpServeConf)
+async def handle(request):
+    name = request.match_info.get('name', "Anonymous")
+    text = "Hello, " + name + str(conf.counter)
 
-try:
-    myServer.serve_forever()
-except KeyboardInterrupt:
-    pass
+    conf.changeCounter()
 
-myServer.server_close()
-print(time.asctime(), "Program Agent Stops - %s:%s" % httpServeConf)
+    if(conf.counter % 2):
+        print(conf.counter)
+        await asyncio.sleep(10)
+    
 
+    return web.Response(text=text)
+
+app = web.Application()
+app.add_routes([web.get('/', handle)])
+
+print(time.asctime(), "Program Agent Starts - %s:%s" % (conf.hostName, conf.hostPort))
+
+web.run_app(app, host=conf.hostName, port=conf.hostPort)
+print(time.asctime(), "Program Agent Stops - %s:%s" % (conf.hostName, conf.hostPort))
