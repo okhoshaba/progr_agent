@@ -1,4 +1,8 @@
 {
-    "hostName": "localhost",
-    "hostPort": 9000
+    "ip": "localhost",
+    "port": 9000,
+    "from": 10,
+    "to": 100,
+    "logfile": "test.log",
+    "log": "yest"
 }
