@@ -55,7 +55,7 @@ async def handle(request):
     messageId = messageCounter
     messageCounter += 1
 
-    logging.info("Start handle message number - ", messageId)
+    logging.info("Start handle message number - %s" % messageId)
 
     message = await request.text()
     sMessage = message.split(' ')

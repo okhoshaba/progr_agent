@@ -26,7 +26,7 @@ messageLength = 10
 
 def get_random_string_list():
     res = []
-    for n in range(10):
+    for n in range(5):
         res.append(get_random_string(messageLength))
     return res
 
@@ -35,10 +35,10 @@ messageList = []
 # messageList.extend(get_random_string_list())
 
 # messageList.append("from 100 to 3")
-messageList.extend(get_random_string_list())
-
-# messageList.append("from 5 to 5")
 # messageList.extend(get_random_string_list())
+
+# messageList.append("from 100 to 500")
+messageList.extend(get_random_string_list())
 
 async def sendMessage(session, url, message):
     global messageCounter
