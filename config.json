@@ -4,5 +4,5 @@
     "from": 10,
     "to": 100,
     "logfile": "test.log",
-    "log": "yest"
+    "log": true
 }

@@ -9,8 +9,22 @@ import time
 import config
 import logging
 from aiohttp import web
+import sys
 
-conf = config.Config('config.json');
+conf = config.Config('config.json')
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("./logs/%s" % conf.logfile),
+        logging.StreamHandler()
+    ]
+)
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
+if(not conf.log):
+    logging.disable(logging.INFO)
 
 messageCounter = 0
 
@@ -41,19 +55,19 @@ async def handle(request):
     messageId = messageCounter
     messageCounter += 1
 
-    print(time.asctime(), "Start handle message number - ", messageId)
+    logging.info("Start handle message number - ", messageId)
 
     message = await request.text()
     sMessage = message.split(' ')
 
-    print(time.asctime(), "Message #", messageId, message)
+    logging.info("Message # %s %s" % (messageId, message))
 
     if(isCommand(sMessage)):
-        print(time.asctime(), "Message #", messageId, message, "is command")
+        logging.info("Message # %s %s %s" % (messageId, message, "is command") )
         return handleCommand(sMessage)
 
     delay = conf.getDelay()
-    print(time.asctime(), "Message #", messageId, "delay", delay)
+    logging.info("Message # %s %s %s" % (messageId, "delay", delay))
 
     await asyncio.sleep(delay)
     
@@ -62,7 +76,7 @@ async def handle(request):
 app = web.Application()
 app.add_routes([web.post('/', handle)])
 
-print(time.asctime(), "Program Agent Starts - %s:%s" % (conf.hostName, conf.hostPort))
+logging.info("Program Agent Starts - %s:%s" % (conf.hostName, conf.hostPort))
 
-web.run_app(app, host=conf.hostName, port=conf.hostPort)
-print(time.asctime(), "Program Agent Stops - %s:%s" % (conf.hostName, conf.hostPort))
+web.run_app(app, host=conf.hostName, port=conf.hostPort, access_log=None)
+logging.info("Program Agent Stops - %s:%s" % (conf.hostName, conf.hostPort))

@@ -32,10 +32,10 @@ def get_random_string_list():
 
 messageList = []
 # messageList.append("from 0 to 0")
-messageList.extend(get_random_string_list())
-
-# messageList.append("from 100 to 3",)
 # messageList.extend(get_random_string_list())
+
+# messageList.append("from 100 to 3")
+messageList.extend(get_random_string_list())
 
 # messageList.append("from 5 to 5")
 # messageList.extend(get_random_string_list())
@@ -51,7 +51,7 @@ async def sendMessage(session, url, message):
     async with session.post(url, data=message) as resp:
         text = await resp.text()
         responseTimeNs = time.time() * 1000
-        # print(time.asctime(), "Response message id:", mId, message, " -> ", text)
+        print(time.asctime(), "Response message id:", mId, message, " -> ", text)
         print(time.asctime(), "Execution time id:", mId, responseTimeNs - requestTimeNs, "ms")
         return text;
 

@@ -16,6 +16,9 @@ class Config:
         self.delayFrom = config['from']
         self.delayTo = config['to']
 
+        self.logfile = config['logfile']
+        self.log = config['log']
+
         self.counter = 0
     
     def changeDelay(self, delayFrom, delayTo):
