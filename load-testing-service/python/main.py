@@ -1,19 +1,23 @@
 import aiohttp
 import asyncio
-import random
 import math
 import time
+import os
+import json
+from dotenv import load_dotenv
 
+load_dotenv()
+print(os.getenv('LOAD_TEST_RPS_SEQUENCE'))
 
-URL = 'http://localhost:8080/'
-RPS_SEQUENCE = [5, 7, 8, 9, 8, 7, 5, 3, 2, 1, 2, 3, 5]
-DURATION = len(RPS_SEQUENCE)  # sec
-DELTA_T = 1  # sec
+URL = os.getenv('LOAD_TEST_URL')
+RPS_SEQUENCE = json.loads(os.getenv('LOAD_TEST_RPS_SEQUENCE'))
+DURATION = len(RPS_SEQUENCE)
+DELTA_T = int(os.getenv('LOAD_TEST_DELTA_T'))
 
 globalReqId = 0
 
 def req_log(reqId, message):
-    print("t", "{:10.4f}".format(time.time()),
+    print("t", "{:10.6f}".format(time.time()),
           "|", "req_id", reqId, "|", message)
 
 
@@ -52,7 +56,7 @@ async def loop(duration, delta):
 
             tms = time.time()
 
-            print(tms)
+            print()
 
             rps = rpsFunction(t)
             print("New iteration rps count:", rpsFunction(t))
