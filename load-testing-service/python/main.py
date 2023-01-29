@@ -7,9 +7,12 @@ import json
 from dotenv import load_dotenv
 
 load_dotenv()
-print(os.getenv('LOAD_TEST_RPS_SEQUENCE'))
 
 URL = os.getenv('LOAD_TEST_URL')
+
+if not URL:
+    raise print(".env variables not found, please read README and create correct .env file") 
+
 RPS_SEQUENCE = json.loads(os.getenv('LOAD_TEST_RPS_SEQUENCE'))
 DURATION = len(RPS_SEQUENCE)
 DELTA_T = int(os.getenv('LOAD_TEST_DELTA_T'))
