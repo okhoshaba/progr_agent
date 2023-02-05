@@ -126,6 +126,10 @@ async def run_sync_repeat():
 
         await run_sync_rps(DELTA_T)
 
+        print("\nEnd sequence id: {}".format(i))
+        print("sleep {:10.3f} sec".format(RPS_REPEAT_DELAY))
+        await asyncio.sleep(RPS_REPEAT_DELAY)
+
 
 async def main():
     print(LOAD_TEST_MODE, 'async')
