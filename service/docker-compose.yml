@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  web:
+    image: nginx
+    volumes:
+      - ./static:/usr/share/nginx/html
+    ports:
+      - "8080:80"
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=test_db
+      - MYSQL_ROOT_PASSWORD=example
+    ports:
+      - '3306:3306'
