@@ -5,6 +5,7 @@ import time
 import os
 import json
 from dotenv import load_dotenv
+import threading
 
 load_dotenv()
 
@@ -30,7 +31,26 @@ def req_log(reqId, message):
         time.time(), reqId, message))
 
 
-async def make_request(session, t, id):
+async def make_request(t, id):
+    # global globalReqId
+    reqId = 1
+    # globalReqId += 1
+
+    message = "Req =>> | iteration_t: {:10.3f} s | iteration_id: {}".format(t, id)
+    req_log(reqId, message)
+
+    async with aiohttp.ClientSession() as session:
+        sendTime = time.time()
+        try:
+            async with session.get(URL) as resp:
+                respTime = int((time.time() - sendTime) * 1000)
+                message = "Res <<= | iteration_t: {:10.3f} s | iteration_id: {} | respTime: {} ms".format(
+                    t, id, respTime)
+                req_log(reqId, message)
+        except Exception as e:
+            req_log(reqId, "Req fail")
+
+async def make_request_sync(session, t, id):
     # global globalReqId
     reqId = 1
     # globalReqId += 1
@@ -62,7 +82,7 @@ async def run_async_rps(duration, delta):
 
     async with aiohttp.ClientSession() as session:
         t = 0
-        tasks = []
+        threads = []
 
         while (t < duration):
 
@@ -74,14 +94,16 @@ async def run_async_rps(duration, delta):
             print("New iteration rps count:", rps_function(t))
 
             for i in range(rps):
-                task = asyncio.create_task(make_request(session, t, i))
-                tasks.append(task)
+                req_thread = threading.Thread(target=make_request_thread, args=(t, i))
+                req_thread.start()
+                threads.append(req_thread)
 
             t += delta
 
             await asyncio.sleep(delta - (time.time() - tms))
 
-        await asyncio.wait(tasks)
+        for t in threads:
+            t.join()
 
 
 async def run_async_repeat():
@@ -93,6 +115,12 @@ async def run_async_repeat():
         print("sleep {:10.3f} sec".format(RPS_REPEAT_DELAY))
         await asyncio.sleep(RPS_REPEAT_DELAY)
 
+def make_request_thread(t, i):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(make_request(t, i))
+    loop.close()
 
 async def run_sync_rps(delta):
     async with aiohttp.ClientSession() as session:
@@ -107,7 +135,7 @@ async def run_sync_rps(delta):
             i = 0
             stopwatch = time.time() - t_start
             while i < rps and stopwatch < delta:
-                await asyncio.create_task(make_request(session, t, i))
+                await asyncio.create_task(make_request_sync(session, t, i))
                 i += 1
                 stopwatch = time.time() - t_start
 
