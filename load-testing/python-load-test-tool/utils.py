@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 import json
+import time
 
 load_dotenv()
 
@@ -20,3 +21,7 @@ LOAD_TEST_MODE = os.getenv('LOAD_TEST_MODE')
 
 def getEnvConfig():
     return URL, RPS_SEQUENCE, DELTA_T, DURATION, RPS_SEQUENCE_REPEAT, RPS_REPEAT_DELAY, LOAD_TEST_MODE
+
+def req_log(reqId, message):
+    print("t: ", "{:10.6f} s | req_id: {:10.0f} | {}".format(
+        time.time(), reqId, message))
